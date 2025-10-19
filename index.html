@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Tutorial</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #22d3ee;
+      --radius: 14px;
+      --gap: 20px;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #22d3ee, #818cf8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #0f172a;
+      font-size: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .lead {
+      color: var(--muted);
+      margin: 2px 0 10px;
+      font-size: 14px;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search {
+      display: flex;
+      align-items: center;
+      background: #1e293b;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      flex: 1;
+      max-width: 260px;
+    }
+
+    .search input {
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 14px;
+      width: 100%;
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: 1px solid #334155;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: var(--accent);
+      color: #0f172a;
+      border-color: var(--accent);
+    }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--gap);
+      margin-top: 24px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: transform .2s ease, box-shadow .2s ease;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+    }
+
+    .thumb {
+      position: relative;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .3s ease;
+    }
+
+    .thumb:hover img {
+      transform: scale(1.05);
+    }
+
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity .2s ease;
+    }
+
+    .thumb:hover .play-overlay {
+      opacity: 1;
+    }
+
+    .play-circle {
+      background: rgba(255,255,255,0.1);
+      border: 2px solid var(--accent);
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .play-circle svg {
+      fill: var(--accent);
+      width: 26px;
+      height: 26px;
+    }
+
+    .card-body {
+      padding: 14px 16px 18px;
+    }
+
+    .title {
+      font-size: 16px;
+      margin: 0 0 6px;
+    }
+
+    .desc {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0 0 8px;
+    }
+
+    .meta {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .badge {
+      background: rgba(255,255,255,0.08);
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      margin-top: 30px;
+      font-size: 13px;
+    }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .lightbox.open {
+      display: flex;
+    }
+
+    .lightbox video {
+      width: 100%;
+      max-width: 900px;
+      border-radius: 12px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 26px;
+      color: #fff;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">FH</div>
+      <div>
+        <h1>Tutorial Pembelajaran</h1>
+        <p class="lead">Memotivasi dan mengajak kalian semua agar bisa Membuat.</p>
+        <div class="controls">
+          <div class="search">
+            <input type="text" id="searchInput" placeholder="Cari video...">
+          </div>
+          <button class="filter-btn active" onclick="filterVideos('gdev', this)">G Dev</button>
+          <button class="filter-btn" onclick="filterVideos('scratch', this)">Scratch</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="grid" id="videoGrid">
+      <!-- GDEV -->
+      <article class="card" data-category="gdev">
+        <div class="thumb" onclick="openVideo('0930 (1).mp4')">
+          <img src="Desain Postingan iic.png" alt="Video 1">
+          <div class="play-overlay">
+            <div class="play-circle"><svg viewBox="0 0 24 24"><path d="M5 3v18l15-9-15-9z"/></svg></div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="title">Video 1 Pengenalan</h3>
+          <p class="desc">Mengenal tentang Gdev dan cara mendowload nya</p>
+          <div class="meta"><span>Oleh <strong>Admin</strong></span><span class="badge">10:24</span></div>
+        </div>
+      </article>
+
+      <article class="card" data-category="gdev">
+        <div class="thumb" onclick="openVideo('0930 (2).mp4')">
+          <img src="Desain Postingan iic.png" alt="Video 2">
+          <div class="play-overlay">
+            <div class="play-circle"><svg viewBox="0 0 24 24"><path d="M5 3v18l15-9-15-9z"/></svg></div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="title">Video 2 Membuat Rintangan</h3>
+          <p class="desc">Langkah demi langkah singkat, cocok untuk tutorial pendek.</p>
+          <div class="meta"><span>Oleh <strong>Contributor</strong></span><span class="badge">07:12</span></div>
+        </div>
+      </article>
+
+      <article class="card" data-category="gdev">
+        <div class="thumb" onclick="openVideo('1001(1).mp4')">
+          <img src="Desain Postingan iic.png" alt="Video 3">
+          <div class="play-overlay">
+            <div class="play-circle"><svg viewBox="0 0 24 24"><path d="M5 3v18l15-9-15-9z"/></svg></div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="title">Video 3 Musuh</h3>
+          <p class="desc">Menampilkan musuh dalam game.</p>
+          <div class="meta"><span>Oleh <strong>Moderator</strong></span><span class="badge">22:45</span></div>
+        </div>
+      </article>
+
+      <article class="card" data-category="gdev">
+        <div class="thumb" onclick="openVideo('1001 (1).mp4')">
+          <img src="Desain Postingan iic.png" alt="Video 4">
+          <div class="play-overlay">
+            <div class="play-circle"><svg viewBox="0 0 24 24"><path d="M5 3v18l15-9-15-9z"/></svg></div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="title">Video 4 finally</h3>
+          <p class="desc">finally tutorial</p>
+          <div class="meta"><span>Oleh <strong>Moderator</strong></span><span class="badge">22:45</span></div>
+        </div>
+      </article>
+      
+
+      <!-- SCRATCH -->
+      <article class="card" data-category="scratch">
+        <div class="thumb" onclick="openVideo('')">
+          <img src="Desain Postingan iic (1).png" alt="Scratch 1">
+          <div class="play-overlay">
+            <div class="play-circle"><svg viewBox="0 0 24 24"><path d="M5 3v18l15-9-15-9z"/></svg></div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="title">Scratch Video 1</h3>
+          <p class="desc">Scratch coming soon.</p>
+          <div class="meta"><span>Oleh <strong>Moderator</strong></span><span class="badge">--:--</span></div>
+        </div>
+      </article>
+
+      <article class="card" data-category="scratch">
+        <div class="thumb" onclick="openVideo('')">
+          <img src="Desain Postingan iic (1).png" alt="Scratch 2">
+          <div class="play-overlay">
+            <div class="play-circle"><svg viewBox="0 0 24 24"><path d="M5 3v18l15-9-15-9z"/></svg></div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="title">Scratch Video 2</h3>
+          <p class="desc">Scratch coming soon.</p>
+          <div class="meta"><span>Oleh <strong>Moderator</strong></span><span class="badge">--:--</span></div>
+        </div>
+      </article>
+
+      <article class="card" data-category="scratch">
+        <div class="thumb" onclick="openVideo('')">
+          <img src="Desain Postingan iic (1).png" alt="Scratch 3">
+          <div class="play-overlay">
+            <div class="play-circle"><svg viewBox="0 0 24 24"><path d="M5 3v18l15-9-15-9z"/></svg></div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="title">Scratch Video 3</h3>
+          <p class="desc">Scratch coming soon.</p>
+          <div class="meta"><span>Oleh <strong>Moderator</strong></span><span class="badge">--:--</span></div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+      <button class="close-btn" onclick="closeVideo()">✕</button>
+      <video id="lightVideo" controls autoplay></video>
+    </div>
+
+    <footer>
+      Dibuat dengan ❤️ cinta dan kasih sayang
+    </footer>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const videoGrid = document.getElementById('videoGrid');
+    const cards = videoGrid.getElementsByClassName('card');
+
+    // 🔍 Fungsi Pencarian
+    searchInput.addEventListener('keyup', () => {
+      const searchTerm = searchInput.value.toLowerCase();
+      Array.from(cards).forEach(card => {
+        const title = card.querySelector('.title').textContent.toLowerCase();
+        card.style.display = title.includes(searchTerm) ? '' : 'none';
+      });
+    });
+
+    // 🧭 Filter GDev dan Scratch
+    function filterVideos(category, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      Array.from(cards).forEach(card => {
+        const isMatch = card.dataset.category === category;
+        card.style.display = isMatch ? '' : 'none';
+      });
+    }
+
+    // 🎥 Lightbox
+    function openVideo(src) {
+      const lb = document.getElementById('lightbox');
+      const vid = document.getElementById('lightVideo');
+      if (!src) return; // tidak ada video
+      vid.src = src;
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeVideo() {
+      const lb = document.getElementById('lightbox');
+      const vid = document.getElementById('lightVideo');
+      vid.pause();
+      vid.src = '';
+      lb.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('lightbox').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeVideo();
+    });
+  </script>
+</body>
+</html>
